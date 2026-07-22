@@ -19,6 +19,19 @@ const pool = mysql.createPool({
 app.use(express.json());
 app.use(cors());
 
+const existeConflito = async (dia, hora, idParaIgnorar = null) => {
+    let query = 'SELECT id from agendamentos where dia = ? AND hora = ?';
+    const params = [dia, hora];
+
+    if (idParaIgnorar) {
+        query += ' AND id != ?';
+        params.push(idParaIgnorar);
+    }
+
+    const [rows] = await pool.execute(query, params);
+    return rows.length > 0;
+}
+
 // Criando agendamento
 app.post('/salvar-agendamento', async (req, res) => {
     const { nome, procedimento, dia, hora } = req.body;
@@ -82,7 +95,7 @@ app.put('/atualizar-agendamento/:id', async (req, res) => {
         const [result] = await pool.execute(updateQuery, [nome, procedimento, dia, hora, id]);
 
         if (result.affectedRows === 0) {
-            return res.status(404).send({message: 'Agendamento não encontrado.'});
+            return res.status(404).send({ message: 'Agendamento não encontrado.' });
         }
 
         res.status(200).send({ message: 'Agendamento atualizado com sucesso!' })
@@ -106,7 +119,7 @@ app.delete('/deletar-agendamento/:id', async (req, res) => {
         res.status(200).send({ message: 'Agendamento excluído com sucesso!' });
     } catch (err) {
         console.error('Erro ao excluir agendamento', err)
-        res.status(500).send({message: 'Erro ao excluir agendamento'})
+        res.status(500).send({ message: 'Erro ao excluir agendamento' })
     }
 })
 
