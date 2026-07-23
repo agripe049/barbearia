@@ -44,8 +44,8 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
         };
 
         const url = modoEdicao
-            ? `http://localhost:300/atualizar-agendamento/${agendamentoEmEdicao.id}`
-            : "http://localhost/salvar-agendamento";
+            ? `http://localhost:3000/atualizar-agendamento/${agendamentoEmEdicao.id}`
+            : "http://localhost:3000/salvar-agendamento";
 
         const metodo = modoEdicao ? "PUT" : "POST";
 
