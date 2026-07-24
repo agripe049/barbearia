@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PROCEDIMENTOS } from "../data/procedimentos";
 
 const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancelarEdicao }) => {
     const [nome, setNome] = useState("");
@@ -102,17 +103,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                     />
                 </label>
-                <label className="block">
-                    <span className="text-sm text-gray-600">Procedimento</span>
-                    <input
-                        type="text"
-                        value={procedimento}
-                        onChange={(e) => setProcedimento(e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
-                </label>
-
-
+                
                 <label className="block">
                     <span className="text-sm text-gray-600">Data</span>
                     <input
@@ -122,6 +113,23 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                     />
                 </label>
+
+                <label className="block">
+                    <span className="text-sm text-gray-600">Procedimento</span>
+                    <select
+                        value={procedimento}
+                        onChange={(e) => setProcedimento(e.target.value)}
+                        className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white"
+                    >
+                        <option value="">Selecione um procedimento</option>
+                        {PROCEDIMENTOS.map((p) => (
+                            <option key={p.nome} value={p.nome}>
+                                {p.nome}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                
                 <label className="block">
                     <span className="text-sm text-gray-600">Hora</span>
                     <input
