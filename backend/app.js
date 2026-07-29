@@ -2,6 +2,7 @@ import express from 'express';
 import mysql from 'mysql2/promise';
 import cors from 'cors';
 import 'dotenv/config';
+import PROCEDIMENTOS from './data/procedimentos.js';
 
 
 const app = express();
@@ -19,9 +20,13 @@ const pool = mysql.createPool({
 app.use(express.json());
 app.use(cors());
 
-const existeConflito = async (dia, hora, idParaIgnorar = null) => {
-    let query = 'SELECT id from agendamentos where dia = ? AND hora = ?';
-    const params = [dia, hora];
+const existeConflito = async (dia, hora, duracao, idParaIgnorar = null) => {
+    let query =
+        `SELECT id from agendamentos
+         where dia = ? 
+            AND hora < ADDTIME(?, SEC_TO_TIME(? * 60))
+            AND ADDTIME(hora, SEC_TO_TIME(duracao * 60)) > ?`;
+    const params = [dia, hora, duracao, hora];
 
     if (idParaIgnorar) {
         query += ' AND id != ?';
@@ -41,12 +46,27 @@ app.post('/salvar-agendamento', async (req, res) => {
     }
 
     try {
+
+        const dadosProcedimento = PROCEDIMENTOS[procedimento];
+
+        if (!dadosProcedimento) {
+            return res.status(400).send({ message: 'Procedimento inválido.' });
+        }
+
+        const { duracao } = dadosProcedimento;
+
+        const conflito = await existeConflito(dia, hora, duracao);
+
+        if (conflito) {
+            return res.status(409).send({ message: 'Esse horário conflita com outro agendamento. Escolha outro' });
+        }
+
         const insertQuery = `
-        INSERT INTO agendamentos (nome, procedimento, dia, hora)
-        VALUES (?,?,?,?);
+        INSERT INTO agendamentos (nome, procedimento, dia, hora, duracao)
+        VALUES (?,?,?,?,?);
         `;
 
-        const [result] = await pool.execute(insertQuery, [nome, procedimento, dia, hora]);
+        const [result] = await pool.execute(insertQuery, [nome, procedimento, dia, hora, duracao]);
 
         console.log(`Agendamento salvo com sucesso! ID: ${result.insertId}`);
 
@@ -58,6 +78,10 @@ app.post('/salvar-agendamento', async (req, res) => {
         res.status(200).send({ message: mensagem })
 
     } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).send({ message: 'Esse horário já esta agendado. Escolha outro' });
+        }
+
         console.error('Erro ao processar o agendamento', err);
         res.status(500).send({ message: "Erro ao salvar agendamento" });
 
@@ -87,12 +111,25 @@ app.put('/atualizar-agendamento/:id', async (req, res) => {
     }
 
     try {
+        const dadosProcedimento = PROCEDIMENTOS[procedimento];
+
+        if (!dadosProcedimento) {
+            return res.status(400).send({ message: 'Procedimento inválido.' });
+        }
+
+        const { duracao } = dadosProcedimento;
+
+        const conflito = await existeConflito(dia, hora, duracao, id);
+
+        if (conflito) {
+            return res.status(409).send({ message: 'Esse horário já está ocupado.Escolha outro.' })
+        }
         const updateQuery = `
         UPDATE agendamentos
-        SET nome = ?, procedimento = ?, dia = ?, hora = ?
+        SET nome = ?, procedimento = ?, dia = ?, hora = ?, duracao = ?
         WHERE id = ?
         `;
-        const [result] = await pool.execute(updateQuery, [nome, procedimento, dia, hora, id]);
+        const [result] = await pool.execute(updateQuery, [nome, procedimento, dia, hora, duracao, id]);
 
         if (result.affectedRows === 0) {
             return res.status(404).send({ message: 'Agendamento não encontrado.' });
@@ -100,6 +137,9 @@ app.put('/atualizar-agendamento/:id', async (req, res) => {
 
         res.status(200).send({ message: 'Agendamento atualizado com sucesso!' })
     } catch (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+            return res.status(409).send({ message: 'Esse horário já esta ocupado. Escolha outro.' })
+        }
         console.error('Erro ao atualizar agendamento', err)
         res.status(500).send({ message: 'Erro ao atualizar agendamentos' });
     }
