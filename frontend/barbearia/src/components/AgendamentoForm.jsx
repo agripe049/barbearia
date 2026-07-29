@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PROCEDIMENTOS } from "../data/procedimentos";
+import PROCEDIMENTOS from "../data/procedimentos";
 
 const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancelarEdicao }) => {
     const [nome, setNome] = useState("");
@@ -124,7 +124,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                         <option value="">Selecione um procedimento</option>
                         {PROCEDIMENTOS.map((p) => (
                             <option key={p.nome} value={p.nome}>
-                                {p.nome}
+                                {p.nome} - R$ {p.preco.toFixed(2)} ({p.duracao} min)
                             </option>
                         ))}
                     </select>
