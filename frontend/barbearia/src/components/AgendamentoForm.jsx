@@ -7,6 +7,8 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
     const [dia, setDia] = useState("");
     const [hora, setHora] = useState("");
     const [carregando, setCarregando] = useState(false);
+    const [horariosDisponiveis, setHorariosDisponiveis] = useState([]);
+    const [carregandoHorarios, setCarregandoHorarios] = useState(false);
 
     const modoEdicao = Boolean(agendamentoEmEdicao);
 
@@ -18,6 +20,37 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
             setHora(agendamentoEmEdicao.hora.slice(0, 5));
         }
     }, [agendamentoEmEdicao]);
+
+    // Toda vez que "dia" ou "procedimento" mudar, busca de novo os horários disponíveis
+    useEffect(() => {
+        const buscarHorarios = async () => {
+            if (!dia || !procedimento) {
+                setHorariosDisponiveis([]);
+                return;
+            }
+
+            setCarregandoHorarios(true);
+
+            try {
+                let url = `http://localhost:3000/horarios-disponiveis?dia=${dia}&procedimento=${encodeURIComponent(procedimento)}`;
+
+                if (modoEdicao) {
+                    url += `&idParaIgnorar=${agendamentoEmEdicao.id}`;
+                }
+
+                const response = await fetch(url);
+                const dados = await response.json();
+                setHorariosDisponiveis(Array.isArray(dados) ? dados : []);
+            } catch (err) {
+                console.error("Erro ao buscar horários disponíveis: ", err);
+                setHorariosDisponiveis([]);
+            } finally {
+                setCarregandoHorarios(false);
+            }
+        };
+
+        buscarHorarios();
+    }, [dia, procedimento]);
 
     const limparFormulario = () => {
         setNome("");
@@ -57,7 +90,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(dadosAgendamento)
-            })
+            });
 
             const result = await response.json();
 
@@ -103,13 +136,16 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                     />
                 </label>
-                
+
                 <label className="block">
                     <span className="text-sm text-gray-600">Data</span>
                     <input
                         type="date"
                         value={dia}
-                        onChange={(e) => setDia(e.target.value)}
+                        onChange={(e) => {
+                            setDia(e.target.value);
+                            setHora("");
+                        }}
                         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
                     />
                 </label>
@@ -118,7 +154,10 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                     <span className="text-sm text-gray-600">Procedimento</span>
                     <select
                         value={procedimento}
-                        onChange={(e) => setProcedimento(e.target.value)}
+                        onChange={(e) => {
+                            setProcedimento(e.target.value);
+                            setHora("");
+                        }}
                         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white"
                     >
                         <option value="">Selecione um procedimento</option>
@@ -129,15 +168,31 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                         ))}
                     </select>
                 </label>
-                
+
                 <label className="block">
                     <span className="text-sm text-gray-600">Hora</span>
-                    <input
+                    <select
                         type="time"
                         value={hora}
                         onChange={(e) => setHora(e.target.value)}
+                        disabled={!dia || !procedimento || carregandoHorarios}
                         className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                    />
+                    >
+                        <option value="">
+                            {!dia || !procedimento
+                                ? "Escolha o procedimento e a data primeiro"
+                                : carregandoHorarios
+                                ? "Carregando horários..."
+                                : horariosDisponiveis.length === 0
+                                ? "Nenhum horário disponível"
+                                : "Selecione um horário"}
+                        </option>
+                        {horariosDisponiveis.map((h) => (
+                            <option key={h} value={h}>
+                                {h}
+                            </option>
+                        ))}
+                    </select>
                 </label>
             </div>
 
