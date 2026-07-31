@@ -142,6 +142,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                     <input
                         type="date"
                         value={dia}
+                        min={new Date().toISOString().split("T")[0]}
                         onChange={(e) => {
                             setDia(e.target.value);
                             setHora("");
