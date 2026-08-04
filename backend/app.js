@@ -3,7 +3,8 @@ import mysql from 'mysql2/promise';
 import cors from 'cors';
 import 'dotenv/config';
 import PROCEDIMENTOS from './data/procedimentos.js';
-
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 const app = express();
 const PORT = 3000;
@@ -19,6 +20,56 @@ const pool = mysql.createPool({
 
 app.use(express.json());
 app.use(cors());
+
+// Rota de login
+app.post('/login', async (req, res) => {
+    const { usuario, senha } = req.body;
+
+    if (!usuario || !senha) {
+        return res.status(400).send({ message: 'Usuário e senha são obrigatórios' });
+    }
+
+    if (usuario !== process.env.ADMIN_USER) {
+        return res.status(401).send({ message: 'Usuário ou senha inválidos' })
+    }
+
+    const senhaCorreta = await bcrypt.compare(senha, process.env.ADMIN_PASSWORD_HASH);
+
+    if (!senhaCorreta) {
+        return res.status(401).send({ message: 'Usuário ou senha inválido' })
+    }
+
+    const token = jwt.sign(
+        { usuario },
+        process.env.JWT_SECRET,
+        { expiresIn: '8h' }
+    );
+
+    res.status(200).send({ token });
+});
+
+// Middleware(Filtro)
+const verificarToken = (req, res, next) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Acesso negado. Faça login.' });
+    }
+
+    const token = authHeader.split(' ')[1];// formato esperado: "Bearer <token>"
+
+    if (!token) {
+        return res.status(401).send({ message: 'Acesso negado. Faça login' });
+    }
+
+    try {
+        jwt.verify(token, process.env.JWT_SECRET);
+        next();
+    } catch (err) {
+        return res.status(400).send({ message: 'Sessão expirada ou inválida. Faça login novamente' })
+    }
+}
+
 
 const existeConflito = async (dia, hora, duracao, idParaIgnorar = null) => {
     let query =
@@ -71,6 +122,21 @@ const gerarSlotsBase = (duracao) => {
     return slots;
 }
 
+// Retorna quantos minutos já se passaram da meia noite até agora
+const minutosAgora = () => {
+    const agora = new Date();
+    return agora.getHours() * 60 + agora.getMinutes();
+};
+
+// Retorna a data de hoje no formato "2026-08-01"
+const dataHojeTexto = () => {
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+};
+
 
 // Mostrando horários disponíveis
 app.get('/horarios-disponiveis', async (req, res) => {
@@ -89,7 +155,12 @@ app.get('/horarios-disponiveis', async (req, res) => {
 
         const { duracao } = dadosProcedimento;
 
-        const slotsBase = gerarSlotsBase(duracao);
+        let slotsBase = gerarSlotsBase(duracao);
+
+        if (dia === dataHojeTexto()) {
+            const agora = minutosAgora();
+            slotsBase = slotsBase.filter((slot) => paraMinutos(slot) > agora);
+        }
 
         // Busca os agendamentos já existentes nesse dia
         let query = 'SELECT hora, duracao from agendamentos where dia = ?';
@@ -141,6 +212,10 @@ app.post('/salvar-agendamento', async (req, res) => {
         return res.status(400).send({ message: 'Não é possível agendar em uma data que já passou' })
     }
 
+    if (dia === dataHojeTexto() && paraMinutos(hora) <= minutosAgora()) {
+        return res.status(400).send({ message: 'Ops, esse horário já passou' })
+    }
+
     try {
 
         const dadosProcedimento = PROCEDIMENTOS[procedimento];
@@ -186,7 +261,7 @@ app.post('/salvar-agendamento', async (req, res) => {
 
 
 // Listando agendamentos
-app.get('/listar-agendamentos', async (req, res) => {
+app.get('/listar-agendamentos', verificarToken, async (req, res) => {
     try {
         const [rows] = await pool.execute('SELECT * FROM agendamentos ORDER BY dia, hora');
         res.status(200).json(rows);
@@ -198,7 +273,7 @@ app.get('/listar-agendamentos', async (req, res) => {
 
 
 // Atualizar agendamentos
-app.put('/atualizar-agendamento/:id', async (req, res) => {
+app.put('/atualizar-agendamento/:id', verificarToken, async (req, res) => {
     const { id } = req.params;
     const { nome, procedimento, dia, hora } = req.body;
 
@@ -207,12 +282,16 @@ app.put('/atualizar-agendamento/:id', async (req, res) => {
     }
 
     const hoje = new Date();
-    hoje.setHours(0,0,0,0);
+    hoje.setHours(0, 0, 0, 0);
 
     const dataAgendamento = new Date(dia + 'T00:00:00');
 
     if (dataAgendamento < hoje) {
         return res.status(400).send({ message: 'Não é possível agendar uma data que já passou' })
+    }
+
+    if (dia === dataHojeTexto() && paraMinutos(hora) <= minutosAgora()) {
+        return res.status(400).send({ message: 'Não é possível agendar em um horário que já passou.' });
     }
 
     try {
@@ -251,7 +330,7 @@ app.put('/atualizar-agendamento/:id', async (req, res) => {
 })
 
 // Deletando agendamento
-app.delete('/deletar-agendamento/:id', async (req, res) => {
+app.delete('/deletar-agendamento/:id', verificarToken, async (req, res) => {
     const { id } = req.params;
 
     try {
