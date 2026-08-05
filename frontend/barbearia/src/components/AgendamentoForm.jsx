@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PROCEDIMENTOS from "../data/procedimentos";
+import { apiFetch } from "../services/api";
 
 const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancelarEdicao }) => {
     const [nome, setNome] = useState("");
@@ -63,7 +64,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
         e.preventDefault()
 
         if (!nome || !procedimento || !dia || !hora) {
-            setMensagem({ texto: "Preencha todos os campos.", tipo: "Erro" });
+            setMensagem({ texto: "Preencha todos os campos.", tipo: "info" });
             return;
         }
 
@@ -84,11 +85,8 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
         const metodo = modoEdicao ? "PUT" : "POST";
 
         try {
-            const response = await fetch(url, {
+            const response = await apiFetch(url.replace("http:localhost:3000", ""), {
                 method: metodo,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify(dadosAgendamento)
             });
 

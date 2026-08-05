@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState, useEffect } from "react";
+import { apiFetch } from '../services/api';
 
 const AgendamentoList = ({ atualizarLista, onEditar, onExcluir, setMensagem }) => {
   const [agendamentos, setAgendamentos] = useState([]);
@@ -11,7 +12,7 @@ const AgendamentoList = ({ atualizarLista, onEditar, onExcluir, setMensagem }) =
     setErro(null);
 
     try {
-      const response = await fetch("http://localhost:3000/listar-agendamentos")
+      const response = await apiFetch("/listar-agendamentos")
 
       if (!response.ok) {
         throw new Error("Não foi possível carregar os agendamentos.")
