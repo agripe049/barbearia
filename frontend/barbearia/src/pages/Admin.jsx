@@ -24,10 +24,13 @@ const Admin = () => {
   };
 
   return (
-    <div>
-      <div>
+    <div className='min-h-screen bg-gray-50 flex flex-col items-center px-4 py-10'>
+      <div className='w-full max-w-md flex justify-between items-center mb-4'>
         <h2>Painel Administrativo</h2>
-        <button>
+        <button
+          onClick={handleLogout}
+          className='text-xs text-gray-500 hover:text-gray-900 underline'
+        >
           Sair
         </button>
       </div>

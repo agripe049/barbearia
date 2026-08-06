@@ -33,13 +33,13 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
             setCarregandoHorarios(true);
 
             try {
-                let url = `http://localhost:3000/horarios-disponiveis?dia=${dia}&procedimento=${encodeURIComponent(procedimento)}`;
+                let url = `/horarios-disponiveis?dia=${dia}&procedimento=${encodeURIComponent(procedimento)}`;
 
                 if (modoEdicao) {
                     url += `&idParaIgnorar=${agendamentoEmEdicao.id}`;
                 }
 
-                const response = await fetch(url);
+                const response = await apiFetch(url);
                 const dados = await response.json();
                 setHorariosDisponiveis(Array.isArray(dados) ? dados : []);
             } catch (err) {
@@ -64,7 +64,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
         e.preventDefault()
 
         if (!nome || !procedimento || !dia || !hora) {
-            setMensagem({ texto: "Preencha todos os campos.", tipo: "info" });
+            setMensagem({ texto: "Preencha todos os campos.", tipo: "erro" });
             return;
         }
 
@@ -79,13 +79,13 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
         };
 
         const url = modoEdicao
-            ? `http://localhost:3000/atualizar-agendamento/${agendamentoEmEdicao.id}`
-            : "http://localhost:3000/salvar-agendamento";
+            ? `/atualizar-agendamento/${agendamentoEmEdicao.id}`
+            : "/salvar-agendamento";
 
         const metodo = modoEdicao ? "PUT" : "POST";
 
         try {
-            const response = await apiFetch(url.replace("http:localhost:3000", ""), {
+            const response = await apiFetch(url, {
                 method: metodo,
                 body: JSON.stringify(dadosAgendamento)
             });
@@ -95,7 +95,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
             if (response.ok) {
                 setMensagem({ texto: result.message, tipo: "sucesso" });
                 limparFormulario();
-                onSalvar();
+                onSalvar?.();
             } else {
                 setMensagem({ texto: "Erro: " + result.message, tipo: "erro" });
             }
@@ -109,7 +109,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
 
     const handleCancelar = () => {
         limparFormulario();
-        onCancelarEdicao();
+        onCancelarEdicao?.();
     }
 
     return (
@@ -118,7 +118,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
             className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-200 p-8"
         >
 
-            <h1 className="text-xl font-medium text-gray-90 mb-1">Barbearia Sr. Ofrélio</h1>
+            <h1 className="text-xl font-medium text-gray-100 mb-1">Barbearia Sr. Ofrélio</h1>
             <p className="text-sm text-gray-500 mb-6">
                 {modoEdicao ? "Editando agendamento" : "Agende seu horário"}
             </p>
@@ -171,7 +171,6 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                 <label className="block">
                     <span className="text-sm text-gray-600">Hora</span>
                     <select
-                        type="time"
                         value={hora}
                         onChange={(e) => setHora(e.target.value)}
                         disabled={!dia || !procedimento || carregandoHorarios}
@@ -208,7 +207,7 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                     <button
                         type="button"
                         onClick={handleCancelar}
-                        className="rounded-lg border-gray-300 text-gray-600 text-sm font-medium px-4 py-2.5 hover:bg-gray-50 transition-colors">
+                        className="rounded-lg border border-gray-300 text-gray-600 text-sm font-medium px-4 py-2.5 hover:bg-gray-50 transition-colors">
                         Cancelar
                     </button>
                 )}
