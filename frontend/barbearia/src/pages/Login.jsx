@@ -46,45 +46,53 @@ const Login = () => {
     };
 
     return (
-        <div className='min-h-screen bg-gray-50 flex items-center justify-center px-4'>
+        <div className='min-h-screen bg-[#F1EFEA] flex items-center justify-center px-4'>
             <form
                 onSubmit={handleSubmit}
-                className='w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-200 p-8'
+                className='w-full max-w-sm bg-[#FAF9F6] rounded-sm border border-[#E4DFD4] shadow-[0_1px_2px_rgba(28,27,26,0.06),0_8px_24px_-8px_rgba(28,27,26,0.12)] px-8 py-8'
             >
-                <h1 className='text-xl font-medium text-gray-900 mb-1'>
+                <p className='text-[11px] tracking-[0.2em] uppercase text-[#A97C50] font-medium mb-1'>
+                    Painel do Barbeiro
+                </p>
+                <h1 className='font-display text-[26px] text-[#1C1B1A] mb-1'>
                     Área do admin
                 </h1>
-                <p className='text-sm text-gray-500 mb-6'>
-                    Faça login para gerenciar os agendamentos
-                </p>
+                <div
+                    className="h-[3px] w-14 rounded-full mb-6"
+                    style={{ background: "repeating-linear-gradient(-45deg, #A97C50 0 6px, #1C1B1A 6px 12px, #FAF9F6 12px 18px)" }}
+                />
 
                 <div className='space-y-4'>
-                    <label className='block'>
-                        <span className='text-sm text-gray-600'>Usuário</span>
+                    <label className="block">
+                        <span className="text-xs font-medium text-[#1C1B1A]/60 uppercase tracking-wide">Usuário</span>
                         <input
                             type="text"
                             value={usuario}
                             onChange={(e) => setUsuario(e.target.value)}
-                            className='mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent' />
+                            placeholder='Digite seu usuário'
+                            className="mt-1.5 w-full rounded-sm border border-[#E4DFD4] bg-white px-3 py-2.5 text-sm text-[#1C1B1A] focus:outline-none focus:border-[#A97C50] focus:ring-1 focus:ring-[#A97C50] transition-colors"
+                        />
                     </label>
-                    <label className='block'>
-                        <span className='text-sm text-gray-600'>Senha</span>
+                    <label className="block">
+                        <span className="text-xs font-medium text-[#1C1B1A]/60 uppercase tracking-wide">Senha</span>
                         <input
                             type="password"
                             value={senha}
                             onChange={(e) => setSenha(e.target.value)}
-                            className='mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent' />
+                            placeholder='Digite sua senha'
+                            className="mt-1.5 w-full rounded-sm border border-[#E4DFD4] bg-white px-3 py-2.5 text-sm text-[#1C1B1A] focus:outline-none focus:border-[#A97C50] focus:ring-1 focus:ring-[#A97C50] transition-colors"
+                        />
                     </label>
                 </div>
 
                 {erro && (
-                    <p className='mt-4 text-sm text-red-600'>{erro}</p>
+                    <p className='mt-4 text-sm text-[#9a3b3b]'>{erro}</p>
                 )}
 
                 <button
                     type="submit"
                     disabled={carregando}
-                    className='mt-6 w-full rounded-lg bg-gray-900 text-white text-sm font-medium py-2.5 hover:bg-gray-800 transition-colors disabled:opacity-50'
+                    className="mt-6 w-full rounded-sm bg-[#1C1B1A] text-[#FAF9F6] text-sm font-medium py-3 hover:bg-[#1C1B1A]/90 transition-colors disabled:opacity-50"
                 >
                     {carregando ? "Entrando..." : "Entrar"}
                 </button>

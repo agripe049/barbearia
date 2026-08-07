@@ -1,22 +1,19 @@
-import React from 'react'
-
 const estilos = {
-    sucesso: "bg-green-50 text-green-700 border-green-200",
-    erro: "bg-red-50 text-red-700 border-red-200",
-    info: "bg-gray-50 text-gray-600 border-gray-200"
+    sucesso: "bg-[#4B5842]/10 text-[#4B5842] border-[#4B5842]/25",
+    erro: "bg-[#9A3B3B]/10 text-[#9A3B3B] border-[#9A3B3B]/25",
+    info: "bg-[#1C1B1A]/5 text-[#1C1B1A]/70 border-[#1C1B1A]/15"
 };
 
 const Resposta = ({ mensagem }) => {
+    if (!mensagem) return null;
 
-    if(!mensagem) return null;
-
-    const {texto, tipo} = mensagem;
+    const { texto, tipo } = mensagem;
 
     return (
-        <div className={`w-full max-w-md mt-4 rounded-lg border px-4 py-3 text-sm ${estilos[tipo] || estilos.info}`}>
-            <p>{texto}</p>
+        <div className={`w-full max-w-md mt-4 rounded-sm border px-4 py-3 text-sm ${estilos[tipo] || estilos.info}`}>
+            {texto}
         </div>
-    )
-}
+    );
+};
 
-export default Resposta
+export default Resposta;
