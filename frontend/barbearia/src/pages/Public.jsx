@@ -1,4 +1,4 @@
-import React from 'react'
+
 import AgendamentoForm from '../components/AgendamentoForm';
 import Resposta from '../components/Resposta';
 import { useState } from "react"

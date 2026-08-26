@@ -88,7 +88,7 @@ const AgendamentoList = ({ atualizarLista, onEditar, onExcluir, setMensagem }) =
   return (
     <div className='w-full max-w-md mt-10'>
       <p className='text-[11px] tracking-[0.2em] uppercase text-[#A97C50] font-medium mb-3'>
-        Agenda
+        Agendamentos
       </p>
 
       <div className='space-y-2.5'>
