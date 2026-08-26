@@ -1,22 +1,31 @@
 import express from 'express';
 import mysql from 'mysql2/promise';
 import cors from 'cors';
+import fs from 'fs';
 import 'dotenv/config';
 import PROCEDIMENTOS from './data/procedimentos.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
-const pool = mysql.createPool({
+const poolConfig = {
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10
-});
+};
+
+if (process.env.DB_SSL_CA) {
+    poolConfig.ssl = { ca: process.env.DB_SSL_CA };
+} else if (process.env.DB_SSL_CA_PATH) {
+    poolConfig.ssl = { ca: fs.readFileSync(process.env.DB_SSL_CA_PATH) };
+}
+const pool = mysql.createPool(poolConfig)
 
 app.use(express.json());
 app.use(cors());
@@ -173,7 +182,7 @@ app.get('/horarios-disponiveis', async (req, res) => {
 
         const [agendamentosDoDia] = await pool.execute(query, params);
 
-        // Remove da lista o shorários que colidiram com algum agendamento existente
+        // Remove da lista os horários que colidiram com algum agendamento existente
         const slotsDisponiveis = slotsBase.filter((slot) => {
             const inicioSlot = paraMinutos(slot);
             const fimSlot = inicioSlot + duracao;
