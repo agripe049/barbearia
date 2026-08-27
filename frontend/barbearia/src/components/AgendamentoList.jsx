@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState, useEffect } from "react";
 import { apiFetch } from '../services/api';
 import  PROCEDIMENTOS  from '../data/procedimentos';
@@ -86,7 +85,7 @@ const AgendamentoList = ({ atualizarLista, onEditar, onExcluir, setMensagem }) =
   }
 
   return (
-    <div className='w-full max-w-md mt-10'>
+    <div className='w-full max-w-md mt-8 sm:mt-10'>
       <p className='text-[11px] tracking-[0.2em] uppercase text-[#A97C50] font-medium mb-3'>
         Agendamentos
       </p>
@@ -98,7 +97,7 @@ const AgendamentoList = ({ atualizarLista, onEditar, onExcluir, setMensagem }) =
           return (
             <div
               key={a.id}
-              className='bg-[#FAF9F6] rounded-sm border border-[#E4DFD4] pl-4 pr-3 py-3.5 flex items-center justify-between gap-3'
+              className='bg-[#FAF9F6] rounded-sm border border-[#E4DFD4] pl-3.5 sm:pl-4 pr-3 py-3 sm:py-3.5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-x-3 gap-y-2'
               style={{ borderLeft: "3px solid #A97C50" }}
             >
               <div className='min-w-0'>
@@ -112,15 +111,15 @@ const AgendamentoList = ({ atualizarLista, onEditar, onExcluir, setMensagem }) =
                 </p>
               </div>
 
-              <div className='flex gap-1.5 shrink-0'>
+              <div className='flex gap-1.5 shrink-0 ml-auto sm:ml-0'>
                 <button
                   onClick={() => onEditar(a)}
-                  className='text-xs font-medium text-[#1C1B1A]/70 hover:text-[#1C1B1A] border border-[#E4DFD4] rounded-sm px-2.5 py-1.5 hover:bg-[#F1EFEA] transition-colors'>
+                  className='text-xs font-medium text-[#1C1B1A]/70 hover:text-[#1C1B1A] border border-[#E4DFD4] rounded-sm px-2.5 py-2 sm:py-1.5 hover:bg-[#F1EFEA] transition-colors'>
                   Editar
                 </button>
                 <button
                   onClick={() => handleExcluir(a.id)}
-                  className='text-xs font-medium text-[#9A3B3B] border border-[#9A3B3B]/25 rounded-sm px-2.5 py-1.5 hover:bg-[#9A3B3B]/10 transition-colors'>
+                  className='text-xs font-medium text-[#9A3B3B] border border-[#9A3B3B]/25 rounded-sm px-2.5 py-2 sm:py-1.5 hover:bg-[#9A3B3B]/10 transition-colors'>
                   Excluir
                 </button>
               </div>

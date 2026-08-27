@@ -6,9 +6,9 @@ import { useState } from "react"
 const Public = () => {
   const [mensagem, setMensagem] = useState(null);
   return (
-    <div className='min-h-screen bg-[#F1EFEA] flex flex-col items-center justify-center px-4 py-10'>
+    <div className='min-h-screen bg-[#F1EFEA] flex flex-col items-center justify-center px-4 py-6 sm:py-10'>
       <AgendamentoForm setMensagem={setMensagem} />
-      <Resposta mensagem={mensagem} />
+      <Resposta mensagem={mensagem} onFechar={() => setMensagem(null)}/>
     </div>
   )
 }

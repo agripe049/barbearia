@@ -49,12 +49,12 @@ const Login = () => {
         <div className='min-h-screen bg-[#F1EFEA] flex items-center justify-center px-4'>
             <form
                 onSubmit={handleSubmit}
-                className='w-full max-w-sm bg-[#FAF9F6] rounded-sm border border-[#E4DFD4] shadow-[0_1px_2px_rgba(28,27,26,0.06),0_8px_24px_-8px_rgba(28,27,26,0.12)] px-8 py-8'
+                className='w-full max-w-sm bg-[#FAF9F6] rounded-sm border border-[#E4DFD4] shadow-[0_1px_2px_rgba(28,27,26,0.06),0_8px_24px_-8px_rgba(28,27,26,0.12)] px-6 sm:px-8 py-6 sm:py-8'
             >
                 <p className='text-[11px] tracking-[0.2em] uppercase text-[#A97C50] font-medium mb-1'>
                     Painel do Barbeiro
                 </p>
-                <h1 className='font-display text-[26px] text-[#1C1B1A] mb-1'>
+                <h1 className='font-display text-2xl sm:text-[26px] text-[#1C1B1A] mb-1'>
                     Área do admin
                 </h1>
                 <div
@@ -70,7 +70,7 @@ const Login = () => {
                             value={usuario}
                             onChange={(e) => setUsuario(e.target.value)}
                             placeholder='Digite seu usuário'
-                            className="mt-1.5 w-full rounded-sm border border-[#E4DFD4] bg-white px-3 py-2.5 text-sm text-[#1C1B1A] focus:outline-none focus:border-[#A97C50] focus:ring-1 focus:ring-[#A97C50] transition-colors"
+                            className="mt-1.5 w-full rounded-sm border border-[#E4DFD4] bg-white px-3 py-3 sm:py-2.5 text-sm text-[#1C1B1A] focus:outline-none focus:border-[#A97C50] focus:ring-1 focus:ring-[#A97C50] transition-colors"
                         />
                     </label>
                     <label className="block">
@@ -80,7 +80,7 @@ const Login = () => {
                             value={senha}
                             onChange={(e) => setSenha(e.target.value)}
                             placeholder='Digite sua senha'
-                            className="mt-1.5 w-full rounded-sm border border-[#E4DFD4] bg-white px-3 py-2.5 text-sm text-[#1C1B1A] focus:outline-none focus:border-[#A97C50] focus:ring-1 focus:ring-[#A97C50] transition-colors"
+                            className="mt-1.5 w-full rounded-sm border border-[#E4DFD4] bg-white px-3 py-3 sm:py-2.5 text-sm text-[#1C1B1A] focus:outline-none focus:border-[#A97C50] focus:ring-1 focus:ring-[#A97C50] transition-colors"
                         />
                     </label>
                 </div>
