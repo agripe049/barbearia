@@ -274,12 +274,8 @@ app.post('/salvar-agendamento', agendamentoLimiter, async (req, res) => {
         return res.status(400).send({ message: 'Todos os campos são obrigatórios.' })
     }
 
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
 
-    const dataAgendamento = new Date(dia + 'T00:00:00');
-
-    if (dataAgendamento < hoje) {
+    if (dia < dataHojeTexto()) {
         return res.status(400).send({ message: 'Não é possível agendar em uma data que já passou' })
     }
 
@@ -349,12 +345,7 @@ app.put('/atualizar-agendamento/:id', verificarToken, async (req, res) => {
         return res.status(400).send({ message: 'Todos os campos são obrigatórios.' })
     }
 
-    const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
-
-    const dataAgendamento = new Date(dia + 'T00:00:00');
-
-    if (dataAgendamento < hoje) {
+    if (dia < dataHojeTexto()) {
         return res.status(400).send({ message: 'Não é possível agendar uma data que já passou' })
     }
 
