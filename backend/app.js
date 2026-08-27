@@ -6,9 +6,12 @@ import 'dotenv/config';
 import PROCEDIMENTOS from './data/procedimentos.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.set('trust proxy', 1);
+
 
 const poolConfig = {
     host: process.env.DB_HOST,
@@ -49,8 +52,26 @@ app.use(cors({
     }
 }));
 
+// Limita tentativas de login, 5 por IP a cada 15 minutos.
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Muitas tentativas de login. Tente novamente mais tarde.' },
+});
+
+// Limita os agendamentos, 5 por IP a cada 15 minutos
+const agendamentoLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { message: 'Muitas tentativas de agendamento. Tente novamente mais tarde.' }
+})
+
 // Rota de login
-app.post('/login', async (req, res) => {
+app.post('/login', loginLimiter, async (req, res) => {
     const { usuario, senha } = req.body;
 
     if (!usuario || !senha) {
@@ -246,7 +267,7 @@ app.get('/horarios-disponiveis', async (req, res) => {
 });
 
 // Criando agendamento
-app.post('/salvar-agendamento', async (req, res) => {
+app.post('/salvar-agendamento', agendamentoLimiter, async (req, res) => {
     const { nome, procedimento, dia, hora } = req.body;
 
     if (!nome || !procedimento || !dia || !hora) {
