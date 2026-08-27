@@ -131,18 +131,40 @@ const gerarSlotsBase = (duracao) => {
     return slots;
 }
 
+const FUSO_HORARIO = 'America/Sao_Paulo';
+
+const agoraNoFuso = () => {
+    const partes = new Intl.DateTimeFormat('en-US', {
+        timeZone: FUSO_HORARIO,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    }).formatToParts(new Date());
+
+    const obter = (tipo) => partes.find((p) => p.type === tipo).value;
+
+    return {
+        ano: obter('year'),
+        mes: obter('month'),
+        dia: obter('day'),
+        hora: Number(obter('hour')),
+        minuto: Number(obter('minute')),
+    };
+};
+
+
 // Retorna quantos minutos já se passaram da meia noite até agora
 const minutosAgora = () => {
-    const agora = new Date();
-    return agora.getHours() * 60 + agora.getMinutes();
+    const { hora, minuto } = agoraNoFuso();
+    return hora * 60 + minuto;
 };
 
 // Retorna a data de hoje no formato "2026-08-01"
 const dataHojeTexto = () => {
-    const agora = new Date();
-    const ano = agora.getFullYear();
-    const mes = String(agora.getMonth() + 1).padStart(2, '0');
-    const dia = String(agora.getDate()).padStart(2, '0');
+    const {ano, mes, dia} = agoraNoFuso();
     return `${ano}-${mes}-${dia}`;
 };
 
