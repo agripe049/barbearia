@@ -28,7 +28,26 @@ if (process.env.DB_SSL_CA) {
 const pool = mysql.createPool(poolConfig)
 
 app.use(express.json());
-app.use(cors());
+
+// Lista de origens autorizadas a chamar essa API.
+// Em produção (Render), defina FRONTEND_URL com o domínio da Vercel.
+// Em desenvolvimento, se a variável não existir, cai para o localhost do Vite.
+
+const origensPermitidas = (process.env.FRONTEND_URL || 'http://localhost:5173')
+    .split(',')
+    .map((origem) => origem.trim());
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Requisições sem "origin" (ex: Postman, curl, apps mobile) são permitidas,
+        // já que o CORS é uma restrição aplicada pelo navegador, não pelo servidor.
+        if (!origin || origensPermitidas.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Origem não permitida pelo CORS'));
+        }
+    }
+}));
 
 // Rota de login
 app.post('/login', async (req, res) => {
@@ -164,7 +183,7 @@ const minutosAgora = () => {
 
 // Retorna a data de hoje no formato "2026-08-01"
 const dataHojeTexto = () => {
-    const {ano, mes, dia} = agoraNoFuso();
+    const { ano, mes, dia } = agoraNoFuso();
     return `${ano}-${mes}-${dia}`;
 };
 
