@@ -272,10 +272,7 @@ app.post('/salvar-agendamento', async (req, res) => {
 
         console.log(`Agendamento salvo com sucesso! ID: ${result.insertId}`);
 
-        const mensagem = `Olá ${nome},
-        aguardamos você para realizar o seu procedimento
-        ${procedimento} no dia
-        ${dia} às ${hora} horas.`;
+        const mensagem = `Olá ${nome}, horário agendado com sucesso!`;
 
         res.status(200).send({ message: mensagem })
 
