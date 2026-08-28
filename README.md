@@ -11,7 +11,7 @@ Sistema de agendamento online para barbearia — o cliente marca o próprio hor�
 <table>
 <tr>
 <td align="center" width="50%"><strong>Agendamento (cliente)</strong><br><img src="docs/agendamentosClientes.png" width="340" alt="Tela pública de agendamento"></td>
-<td align="center" width="50%"><strong>Painel administrativo</strong><br><img src="docs/paineladmin.png" width="340" alt="Painel administrativo"></td>
+<td align="center" width="50%"><strong>Painel administrativo</strong><br><img src="docs/painelAdmin.png" width="340" alt="Painel administrativo"></td>
 </tr>
 </table>
 
