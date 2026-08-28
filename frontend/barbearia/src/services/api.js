@@ -27,5 +27,25 @@ export const apiFetch = async (endpoint, opcoes = {}) => {
         headers,
     });
 
+    // Se havia um token salvo e o backend recusou por causa dele (sessão
+    // expirada ou token inválido), limpa o token e manda o admin de volta
+    // para o login automaticamente. Usamos o texto da mensagem (em vez de
+    // só o status 400/401) para não confundir com outros erros de validação
+    // que também usam esses códigos, como campos obrigatórios faltando.
+
+    if (token && (response.status === 401 || response.status === 400)) {
+        try {
+            const clone = response.clone();
+            const dados = await clone.json();
+            const mensagem = dados?.message || "";
+
+            if (mensagem.toLowerCase().includes("login") || mensagem.toLowerCase().includes("sessão")) {
+                removerToken();
+                window.location.href = "/login";
+            }
+        } catch {
+
+        }
+    }
     return response;
 }
