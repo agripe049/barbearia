@@ -29,10 +29,10 @@ Sistema de agendamento online para barbearia — o cliente marca o próprio hor�
 
 ## Tecnologias
 
-**Frontend** — React · Vite · React Router · Tailwind CSS
-**Backend** — Node.js · Express · MySQL (mysql2)
-**Autenticação** — JWT · bcrypt
-**Infraestrutura** — Vercel (frontend) · Render (backend) · Aiven (MySQL)
+- **Frontend** — React · Vite · React Router · Tailwind CSS
+- **Backend** — Node.js · Express · MySQL (mysql2)
+- **Autenticação** — JWT · bcrypt
+- **Infraestrutura** — Vercel (frontend) · Render (backend) · Aiven (MySQL)
 
 ## Segurança
 
