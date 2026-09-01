@@ -154,8 +154,16 @@ const AgendamentoForm = ({ setMensagem, agendamentoEmEdicao, onSalvar, onCancela
                         value={dia}
                         min={new Date().toISOString().split("T")[0]}
                         onChange={(e) => {
-                            setDia(e.target.value);
+                            const novaData = e.target.value;
+                            setDia(novaData);
                             setHora("");
+
+                            if (novaData) {
+                                const diaDaSemana = new Date(`${novaData}T00:00:00`).getDay();
+                                if (diaDaSemana === 0) {
+                                    setMensagem({ texto: 'O dia escolhido é domingo! Escolha outra data.', tipo: "erro" });
+                                }
+                            }
                         }}
                         className="mt-1.5 w-full rounded-sm border border-[#E4DFD4] bg-white px-3 py-3 sm:py-2.5 text-sm text-[#1C1B1A] focus:outline-none focus:border-[#A97C50] focus:ring-1 focus:ring-[#A97C50] transition-colors"
                     />
