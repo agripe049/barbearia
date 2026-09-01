@@ -208,6 +208,14 @@ const dataHojeTexto = () => {
     return `${ano}-${mes}-${dia}`;
 };
 
+// Retorna true se a data (no formato "aaaa-mm-dd") cai num domingo.
+// Usa Date.UTC para calcular o dia da semana sem depender do fuso do servidor.
+const ehDomingo = (diaTexto) => {
+    const [ano, mes, dia] = diaTexto.split('-').map(Number);
+    const data = new Date(Date.UTC(ano, mes - 1, dia));
+    return data.getUTCDay() === 0;
+}
+
 
 // Mostrando horários disponíveis
 app.get('/horarios-disponiveis', async (req, res) => {
@@ -215,6 +223,9 @@ app.get('/horarios-disponiveis', async (req, res) => {
 
     if (!dia || !procedimento) {
         return res.status(400).send({ message: 'Informe o dia e o procedimento.' });
+    }
+    if (ehDomingo(dia)) {
+        return res.status(200).json([]);
     }
 
     try {
@@ -266,6 +277,8 @@ app.get('/horarios-disponiveis', async (req, res) => {
     }
 });
 
+
+
 // Criando agendamento
 app.post('/salvar-agendamento', agendamentoLimiter, async (req, res) => {
     const { nome, procedimento, dia, hora } = req.body;
@@ -277,6 +290,10 @@ app.post('/salvar-agendamento', agendamentoLimiter, async (req, res) => {
 
     if (dia < dataHojeTexto()) {
         return res.status(400).send({ message: 'Não é possível agendar em uma data que já passou' })
+    }
+
+    if (ehDomingo(dia)) {
+        return res.status(400).send({ message: 'O dia escolhido é domingo! Escolha outra data.' })
     }
 
     if (dia === dataHojeTexto() && paraMinutos(hora) <= minutosAgora()) {
@@ -324,6 +341,7 @@ app.post('/salvar-agendamento', agendamentoLimiter, async (req, res) => {
 });
 
 
+
 // Listando agendamentos
 app.get('/listar-agendamentos', verificarToken, async (req, res) => {
     try {
@@ -334,6 +352,7 @@ app.get('/listar-agendamentos', verificarToken, async (req, res) => {
         res.status(500).send({ message: 'Erro interno ao buscar agendamento' })
     }
 })
+
 
 
 // Atualizar agendamentos
@@ -347,6 +366,10 @@ app.put('/atualizar-agendamento/:id', verificarToken, async (req, res) => {
 
     if (dia < dataHojeTexto()) {
         return res.status(400).send({ message: 'Não é possível agendar uma data que já passou' })
+    }
+
+    if (ehDomingo(dia)) {
+        return res.status(400).send({ message: 'O dia escolhido é domingo! Escolha outra data.' })
     }
 
     if (dia === dataHojeTexto() && paraMinutos(hora) <= minutosAgora()) {
